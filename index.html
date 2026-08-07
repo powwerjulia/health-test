@@ -151,30 +151,50 @@
     color: #6F8F84;
   }
 
-  .preview-block {
-    border-top: 1px solid #24352F;
-    border-bottom: 1px solid #24352F;
-    padding: 1.25rem 0 1.1rem;
-    display: flex;
+  .preview-block { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .preview-shot { padding: 1.1rem 0.75rem; }
+
+  .preview-sub { font-size: 0.8125rem; color: #6F8F84; line-height: 1.5; }
+
+  /* сетка на восемь систем */
+  .dash8 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.15rem 0.5rem;
+    position: relative;
+  }
+
+  .dash8 .dial {
     flex-direction: column;
-    gap: 0.35rem;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+    min-width: 0;
   }
 
-  .preview-title {
-    font-family: var(--serif);
-    font-size: 1.0625rem;
-    color: var(--dark-ink);
-  }
+  .dash8 .ring { flex: 0 0 auto; }
 
-  .preview-sub { font-size: 0.8125rem; color: #6F8F84; }
-
-  .preview-rings {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.35rem;
-    margin-top: 0.9rem;
-    opacity: .95;
+  .dash8 .lab {
+    font-size: 0.6875rem;
+    line-height: 1.3;
+    color: #C6D6D0;
+    max-width: none;
+    min-width: 0;
   }
+  .dash8 .lab b { display: block; font-weight: 400; }
+  .dash8 .lab i {
+    display: block;
+    margin-bottom: 0.1rem;
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6F8F84;
+  }
+  .dash8 .dial.lead .lab b { color: var(--dark-ink); }
+  .dash8 .dial.lead .lab i { color: #E08A6A; }
 
   .btn {
     display: block;
@@ -418,23 +438,49 @@
   .dial { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; text-align: center; }
 
   .ring { position: relative; display: grid; place-items: center; }
-  .ring svg { display: block; transform: rotate(-90deg); }
+  .ring svg { display: block; transform: rotate(-90deg); position: relative; z-index: 2; }
+
+  /* купол под кольцом — даёт объём */
+  .ring .dome {
+    position: absolute;
+    inset: 14%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 36% 28%, rgba(255,255,255,.13), rgba(255,255,255,0) 58%),
+      radial-gradient(circle at 50% 118%, rgba(0,0,0,.55), rgba(0,0,0,0) 62%),
+      #16241F;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.07), inset 0 -6px 12px -6px rgba(0,0,0,.8);
+    z-index: 1;
+  }
+
   .ring .num {
     position: absolute;
+    z-index: 3;
     font-family: var(--serif);
     font-weight: 500;
     color: var(--dark-ink);
     font-variant-numeric: tabular-nums;
     line-height: 1;
+    text-shadow: 0 1px 2px rgba(0,0,0,.45);
   }
 
   .ring.big { width: 86px; height: 86px; }
   .ring.big .num { font-size: 1.4rem; }
   .ring.sm { width: 52px; height: 52px; }
   .ring.sm .num { font-size: 0.875rem; }
+  .ring.md { width: 66px; height: 66px; }
+  .ring.md .num { font-size: 1.125rem; }
 
   .ring circle.val {
-    transition: stroke-dashoffset 1.05s cubic-bezier(.25,.9,.3,1);
+    transition: stroke-dashoffset 1.15s cubic-bezier(.25,.9,.3,1);
+  }
+
+  .ring.z-ok svg    { filter: drop-shadow(0 0 5px rgba(110,214,168,.45)); }
+  .ring.z-warn svg  { filter: drop-shadow(0 0 5px rgba(238,196,101,.45)); }
+  .ring.z-alert svg { filter: drop-shadow(0 0 6px rgba(240,138,105,.5)); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ring circle.val { transition: none; }
   }
 
   .dial .lab {
@@ -704,6 +750,18 @@
   #start a:focus-visible, .gate input:focus-visible, .gate button:focus-visible { outline-color: #7FC4AC; }
 </style>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <linearGradient id="grad-ok" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#8FE3BC"/><stop offset="55%" stop-color="#5FB894"/><stop offset="100%" stop-color="#35785C"/>
+  </linearGradient>
+  <linearGradient id="grad-warn" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#FFD98A"/><stop offset="55%" stop-color="#E0AE4B"/><stop offset="100%" stop-color="#A87A28"/>
+  </linearGradient>
+  <linearGradient id="grad-alert" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#FBA88A"/><stop offset="55%" stop-color="#DE7A5A"/><stop offset="100%" stop-color="#A9482F"/>
+  </linearGradient>
+</defs></svg>
+
 <div class="stage">
   <p class="stage-note"><b>Прототип.</b> Тест рабочий: пройдите его — результат считается по реальной матрице весов. На телефоне открывается на весь экран.</p>
 
@@ -723,9 +781,16 @@
       </div>
 
       <div class="preview-block">
-        <p class="preview-title">Твой персональный дашборд здоровья</p>
-        <p class="preview-sub">Увидишь, как сейчас работает каждая из восьми систем тела, что тянет тебя вниз сильнее всего и с чего начинать</p>
-        <div class="preview-rings" id="previewRings"></div>
+        <div class="shot preview-shot">
+          <div class="shot-head"><span class="t">карта твоего тела</span><span class="t">пример</span></div>
+          <div class="dash8" id="previewRings"></div>
+          <div class="shot-foot"><span class="legend">
+            <i><b style="background:var(--ok)"></b>норма</i>
+            <i><b style="background:var(--warn)"></b>внимание</i>
+            <i><b style="background:var(--alert)"></b>приоритет</i>
+          </span><span>powwer julia</span></div>
+        </div>
+        <p class="preview-sub">Так выглядит результат. Увидишь, как сейчас работает каждая из восьми систем тела, что тянет тебя вниз сильнее всего и с чего начинать.</p>
       </div>
 
       <div>
@@ -1090,28 +1155,43 @@
   function zone(p) { return p > 55 ? "alert" : p >= 30 ? "warn" : "ok"; }
   function zoneColor(p) { return "var(--" + zone(p) + ")"; }
 
-  function ringHTML(pct, big) {
-    var r = big ? 38 : 23, sw = big ? 6 : 4.5, size = big ? 86 : 52;
-    var c = 2 * Math.PI * r;
-    return '<div class="ring ' + (big ? "big" : "sm") + '">' +
-      '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' +
-      '<circle cx="' + size/2 + '" cy="' + size/2 + '" r="' + r + '" fill="none" stroke="#25352F" stroke-width="' + sw + '"/>' +
-      '<circle class="val" cx="' + size/2 + '" cy="' + size/2 + '" r="' + r + '" fill="none" stroke="' + zoneColor(pct) + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + c.toFixed(1) + '" data-target="' + (c * (1 - pct / 100)).toFixed(1) + '"/>' +
+  var SIZES = { big: { s: 86, r: 38, w: 7 }, md: { s: 66, r: 28.5, w: 6 }, sm: { s: 52, r: 23, w: 5 } };
+
+  function ringHTML(pct, size) {
+    var k = (size === true) ? "big" : (size || "sm");
+    var d = SIZES[k], c = 2 * Math.PI * d.r, z = zone(pct);
+    return '<div class="ring ' + k + ' z-' + z + '">' +
+      '<span class="dome"></span>' +
+      '<svg width="' + d.s + '" height="' + d.s + '" viewBox="0 0 ' + d.s + ' ' + d.s + '">' +
+      '<circle cx="' + d.s/2 + '" cy="' + d.s/2 + '" r="' + d.r + '" fill="none" stroke="#22322C" stroke-width="' + d.w + '"/>' +
+      '<circle class="val" cx="' + d.s/2 + '" cy="' + d.s/2 + '" r="' + d.r + '" fill="none" stroke="url(#grad-' + z + ')" stroke-width="' + d.w + '" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + c.toFixed(1) + '" data-target="' + (c * (1 - pct / 100)).toFixed(1) + '"/>' +
       '</svg><span class="num">' + pct + '</span></div>';
   }
 
   /* ---------- превью на старте ---------- */
 
   (function () {
-    var demo = [72, 54, 31, 22];
-    el("previewRings").innerHTML = demo.map(function (d) { return ringHTML(d, false); }).join("");
-    setTimeout(function () { animateRings(el("previewRings")); }, 350);
+    var demo = [
+      ["Тонкий кишечник и бактерии", 74, "главное"],
+      ["Сахар в крови и вес",        61, "2 место"],
+      ["Энергия и надпочечники",     55, "3 место"],
+      ["Желудок и переваривание",    48, ""],
+      ["Желчь и печень",             42, ""],
+      ["Стул и работа кишечника",    38, ""],
+      ["Щитовидная железа и цикл",   30, ""],
+      ["Сон, тревога, настроение",   26, ""]
+    ];
+    el("previewRings").innerHTML = demo.map(function (d, i) {
+      return '<div class="dial' + (i === 0 ? " lead" : "") + '">' + ringHTML(d[1], "md") +
+        '<span class="lab">' + (d[2] ? '<i>' + d[2] + '</i>' : "") + '<b>' + d[0] + '</b></span></div>';
+    }).join("");
+    setTimeout(function () { animateRings(el("previewRings")); }, 400);
   })();
 
   function animateRings(root) {
     var vals = root.querySelectorAll("circle.val");
     Array.prototype.forEach.call(vals, function (c, i) {
-      setTimeout(function () { c.style.strokeDashoffset = c.getAttribute("data-target"); }, i * 110);
+      setTimeout(function () { c.style.strokeDashoffset = c.getAttribute("data-target"); }, i * 90);
     });
   }
 
@@ -1280,12 +1360,12 @@
         top.map(function (s, i) {
           var rk = tie ? (i < 2 ? "главное" : "3 место") : (i === 0 ? "главное" : (i + 1) + " место");
           return '<div class="dial big"><span class="rank">' + rk + '</span>' +
-            ringHTML(s.pct, true) + '<span class="lab">' + s.name + '</span></div>';
+            ringHTML(s.pct, "big") + '<span class="lab">' + s.name + '</span></div>';
         }).join("") +
       '</div>' +
       '<div class="rings-rest">' +
         rest.map(function (s) {
-          return '<div class="dial">' + ringHTML(s.pct, false) + '<span class="lab">' + SYS[s.key].short + '</span></div>';
+          return '<div class="dial">' + ringHTML(s.pct, "sm") + '<span class="lab">' + SYS[s.key].short + '</span></div>';
         }).join("") +
       '</div>' +
       '<div class="shot-foot"><span class="legend">' +
