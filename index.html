@@ -38,6 +38,12 @@
     --r: 14px;
   }
 
+  /* минимальный сброс — чтобы файл выглядел одинаково везде,
+     а не полагался на умолчания браузера */
+  *, *::before, *::after { box-sizing: border-box; }
+  body, h1, h2, h3, h4, p, ul, ol, li, figure, blockquote { margin: 0; padding: 0; }
+  button { font: inherit; color: inherit; }
+
   * { -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
 
@@ -153,11 +159,11 @@
 
   .preview-block { display: flex; flex-direction: column; gap: 0.75rem; }
 
-  .preview-shot { padding: 1.1rem 0.75rem; }
+  .shot.preview-shot { padding: 0.9rem 0.75rem 1.1rem; gap: 0.9rem; }
 
   .preview-sub {
     font-family: var(--mono);
-    font-size: 0.6875rem;
+    font-size: 0.5625rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #6F8F84;
@@ -166,8 +172,8 @@
 
   .shot-title {
     font-family: var(--serif);
-    font-size: 1.0625rem;
-    line-height: 1.3;
+    font-size: 1.375rem;
+    line-height: 1.25;
     color: var(--dark-ink);
     text-wrap: balance;
     position: relative;
@@ -198,19 +204,7 @@
     max-width: none;
     min-width: 0;
   }
-  .dash8 .lab b { display: block; font-weight: 400; }
-  .dash8 .lab i {
-    display: block;
-    margin-bottom: 0.1rem;
-    font-style: normal;
-    font-family: var(--mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #6F8F84;
-  }
-  .dash8 .dial.lead .lab b { color: var(--dark-ink); }
-  .dash8 .dial.lead .lab i { color: #E08A6A; }
+  .dash8 .lab b { display: block; font-weight: 400; text-transform: lowercase; }
 
   .btn {
     display: block;
@@ -223,40 +217,24 @@
     font-weight: 600;
     cursor: pointer;
     color: #0C1714;
-    background: linear-gradient(135deg, #B2E8CF 0%, #7FC4AC 45%, #56A48A 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.55),
-      inset 0 -6px 12px -8px rgba(0,0,0,.35),
-      0 6px 18px -6px rgba(127,196,172,.5),
-      0 0 26px -2px rgba(127,196,172,.32);
-    animation: btnGlow 3.4s ease-in-out infinite alternate;
+    background: #7FC4AC;
+    box-shadow: 0 0 16px -4px rgba(127,196,172,.28);
+    animation: btnGlow 3.8s ease-in-out infinite alternate;
     transition: transform .12s ease, filter .12s ease;
   }
 
   @keyframes btnGlow {
-    from {
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.55),
-        inset 0 -6px 12px -8px rgba(0,0,0,.35),
-        0 6px 18px -6px rgba(127,196,172,.45),
-        0 0 22px -4px rgba(127,196,172,.26);
-    }
-    to {
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.55),
-        inset 0 -6px 12px -8px rgba(0,0,0,.35),
-        0 8px 22px -6px rgba(127,196,172,.6),
-        0 0 38px 0 rgba(127,196,172,.42);
-    }
+    from { box-shadow: 0 0 12px -5px rgba(127,196,172,.2); }
+    to   { box-shadow: 0 0 22px -3px rgba(127,196,172,.34); }
   }
 
   .btn:active { transform: scale(.985); filter: brightness(.95); }
 
   .btn.light {
-    background: linear-gradient(135deg, #2A7A6A 0%, #1B5F52 55%, #14493E 100%);
+    background: var(--accent);
     color: #fff;
     animation: none;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 4px 12px -6px rgba(27,95,82,.6);
+    box-shadow: none;
   }
 
   .btn.ghost {
@@ -529,9 +507,9 @@
     transition: stroke-dashoffset 1.15s cubic-bezier(.25,.9,.3,1);
   }
 
-  .ring.z-ok svg    { filter: drop-shadow(0 0 5px rgba(110,214,168,.45)); }
-  .ring.z-warn svg  { filter: drop-shadow(0 0 5px rgba(238,196,101,.45)); }
-  .ring.z-alert svg { filter: drop-shadow(0 0 6px rgba(240,138,105,.5)); }
+  .ring.z-ok svg    { filter: drop-shadow(0 0 3px rgba(110,214,168,.26)); }
+  .ring.z-warn svg  { filter: drop-shadow(0 0 3px rgba(238,196,101,.26)); }
+  .ring.z-alert svg { filter: drop-shadow(0 0 3px rgba(240,138,105,.3)); }
 
   @media (prefers-reduced-motion: reduce) {
     .ring circle.val { transition: none; }
@@ -1226,18 +1204,18 @@
 
   (function () {
     var demo = [
-      ["Тонкий кишечник и бактерии", 74, "главное"],
-      ["Сахар в крови и вес",        61, "2 место"],
-      ["Энергия и надпочечники",     55, "3 место"],
-      ["Желудок и переваривание",    48, ""],
-      ["Желчь и печень",             42, ""],
-      ["Стул и работа кишечника",    38, ""],
-      ["Щитовидная железа и цикл",   30, ""],
-      ["Сон, тревога, настроение",   26, ""]
+      ["Тонкий кишечник и бактерии", 74],
+      ["Сахар в крови и вес",        61],
+      ["Энергия и надпочечники",     55],
+      ["Желудок и переваривание",    48],
+      ["Желчь и печень",             42],
+      ["Стул и работа кишечника",    38],
+      ["Щитовидная железа и цикл",   30],
+      ["Сон, тревога, настроение",   26]
     ];
-    el("previewRings").innerHTML = demo.map(function (d, i) {
-      return '<div class="dial' + (i === 0 ? " lead" : "") + '">' + ringHTML(d[1], "md") +
-        '<span class="lab">' + (d[2] ? '<i>' + d[2] + '</i>' : "") + '<b>' + d[0] + '</b></span></div>';
+    el("previewRings").innerHTML = demo.map(function (d) {
+      return '<div class="dial">' + ringHTML(d[1], "md") +
+        '<span class="lab"><b>' + d[0] + '</b></span></div>';
     }).join("");
     setTimeout(function () { animateRings(el("previewRings")); }, 400);
   })();
