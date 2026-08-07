@@ -155,7 +155,23 @@
 
   .preview-shot { padding: 1.1rem 0.75rem; }
 
-  .preview-sub { font-size: 0.8125rem; color: #6F8F84; line-height: 1.5; }
+  .preview-sub {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6F8F84;
+    text-align: center;
+  }
+
+  .shot-title {
+    font-family: var(--serif);
+    font-size: 1.0625rem;
+    line-height: 1.3;
+    color: var(--dark-ink);
+    text-wrap: balance;
+    position: relative;
+  }
 
   /* сетка на восемь систем */
   .dash8 {
@@ -206,14 +222,51 @@
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    background: #7FC4AC;
-    color: #0E1A17;
+    color: #0C1714;
+    background: linear-gradient(135deg, #B2E8CF 0%, #7FC4AC 45%, #56A48A 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.55),
+      inset 0 -6px 12px -8px rgba(0,0,0,.35),
+      0 6px 18px -6px rgba(127,196,172,.5),
+      0 0 26px -2px rgba(127,196,172,.32);
+    animation: btnGlow 3.4s ease-in-out infinite alternate;
     transition: transform .12s ease, filter .12s ease;
   }
 
+  @keyframes btnGlow {
+    from {
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.55),
+        inset 0 -6px 12px -8px rgba(0,0,0,.35),
+        0 6px 18px -6px rgba(127,196,172,.45),
+        0 0 22px -4px rgba(127,196,172,.26);
+    }
+    to {
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.55),
+        inset 0 -6px 12px -8px rgba(0,0,0,.35),
+        0 8px 22px -6px rgba(127,196,172,.6),
+        0 0 38px 0 rgba(127,196,172,.42);
+    }
+  }
+
   .btn:active { transform: scale(.985); filter: brightness(.95); }
-  .btn.light { background: var(--accent); color: #fff; }
-  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); font-weight: 500; }
+
+  .btn.light {
+    background: linear-gradient(135deg, #2A7A6A 0%, #1B5F52 55%, #14493E 100%);
+    color: #fff;
+    animation: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 4px 12px -6px rgba(27,95,82,.6);
+  }
+
+  .btn.ghost {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    font-weight: 500;
+    animation: none;
+    box-shadow: none;
+  }
 
   .fineprint { font-size: 0.75rem; color: #6F8F84; text-align: center; margin-top: 0.875rem; }
 
@@ -352,6 +405,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .pulse { animation: none; }
+    .btn { animation: none; }
     * { transition-duration: .01ms !important; }
   }
 
@@ -782,7 +836,7 @@
 
       <div class="preview-block">
         <div class="shot preview-shot">
-          <div class="shot-head"><span class="t">карта твоего тела</span><span class="t">пример</span></div>
+          <p class="shot-title">Собери карту своего тела из восьми систем</p>
           <div class="dash8" id="previewRings"></div>
           <div class="shot-foot"><span class="legend">
             <i><b style="background:var(--ok)"></b>норма</i>
@@ -790,7 +844,7 @@
             <i><b style="background:var(--alert)"></b>приоритет</i>
           </span><span>powwer julia</span></div>
         </div>
-        <p class="preview-sub">Так выглядит результат. Увидишь, как сейчас работает каждая из восьми систем тела, что тянет тебя вниз сильнее всего и с чего начинать.</p>
+        <p class="preview-sub">Пример результата</p>
       </div>
 
       <div>
