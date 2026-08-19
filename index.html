@@ -868,7 +868,7 @@
      Персональных данных не собираем: ни имени, ни почты.
      Адрес появится после развёртывания Apps Script; пока пусто — ничего не отправляется. */
 
-  var TRACK_URL = "";
+  var TRACK_URL = "https://script.google.com/macros/s/AKfycbzXqbYmgoqAxV5dkp9Nwmu8Bl35gwMgainD8xf-80SjtQLffArRACmLs73K5tghGNc/exec";
 
   var SID = (function () {
     var s = "";
@@ -1616,7 +1616,11 @@
     });
 
     var cta = el("result").querySelector("a.btn");
-    if (cta) cta.addEventListener("click", function () { track({ event: "нажал на интенсив" }, true); });
+    if (cta) cta.addEventListener("click", function () {
+      if (cta.dataset.sent) return;      // считаем клик один раз, даже если нажали дважды
+      cta.dataset.sent = "1";
+      track({ event: "нажал на интенсив" }, true);
+    });
 
     el("again").addEventListener("click", function () { ans = {}; idx = 0; show("start"); });
   }
