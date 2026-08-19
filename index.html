@@ -864,6 +864,41 @@
 (function () {
   "use strict";
 
+  /* ---------- тихая отправка ответов ----------
+     Персональных данных не собираем: ни имени, ни почты.
+     Адрес появится после развёртывания Apps Script; пока пусто — ничего не отправляется. */
+
+  var TRACK_URL = "";
+
+  var SID = (function () {
+    var s = "";
+    for (var i = 0; i < 12; i++) s += "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)];
+    return s;
+  })();
+
+  var T0 = Date.now();
+  var sentFinal = false;
+
+  function track(payload, beacon) {
+    if (!TRACK_URL) return;
+    payload.sid = SID;
+    payload.device = (window.innerWidth < 768 ? "телефон" : "компьютер");
+    payload.dur = Math.round((Date.now() - T0) / 1000);
+    var body = JSON.stringify(payload);
+    try {
+      if (beacon && navigator.sendBeacon) {
+        navigator.sendBeacon(TRACK_URL, new Blob([body], { type: "text/plain;charset=utf-8" }));
+      } else {
+        fetch(TRACK_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: body
+        }).catch(function () {});
+      }
+    } catch (e) { /* сбор данных никогда не должен ломать тест */ }
+  }
+
   var SYS = {
     gastro:  { name: "Желудок и переваривание",   short: "Желудок", max: 0 },
     micro:   { name: "Тонкий кишечник и бактерии", short: "Тонкий кишечник", max: 0 },
@@ -1275,10 +1310,18 @@
     if (ph) ph.scrollTop = 0;
   }
 
-  el("go").addEventListener("click", function () { idx = 0; show("quiz"); render(); });
+  el("go").addEventListener("click", function () {
+    idx = 0; T0 = Date.now(); track({ event: "начал" });
+    show("quiz"); render();
+  });
   el("back").addEventListener("click", function () {
     if (idx === 0) { show("start"); return; }
     idx--; render();
+  });
+
+  window.addEventListener("pagehide", function () {
+    if (sentFinal || !el("quiz").classList.contains("on")) return;
+    track({ event: "ушёл", lastQ: idx + 1 }, true);
   });
 
   function questionText(q) {
@@ -1287,6 +1330,7 @@
   }
 
   function render() {
+    locked = false;
     var q = Q[idx];
     el("counter").textContent = (idx + 1) + " / " + Q.length;
     el("fill").style.width = ((idx) / Q.length * 100) + "%";
@@ -1316,7 +1360,10 @@
     mn.onclick = function () { next(); };
   }
 
+  var locked = false;   // защита от двойного тапа: иначе перескакивает через вопрос
+
   function pick(q, i, label, node) {
+    if (locked) return;
     if (q.multi) {
       var arr = Array.isArray(ans[q.id]) ? ans[q.id] : [];
       var at = arr.indexOf(label);
@@ -1329,7 +1376,8 @@
     if (q.profile === "age" || q.profile === "cycle" || q.profile === "concern") ans[q.id] = label;
     Array.prototype.forEach.call(el("opts").children, function (c) { c.classList.remove("sel"); });
     node.classList.add("sel");
-    setTimeout(next, 200);
+    locked = true;
+    setTimeout(function () { locked = false; next(); }, 200);
   }
 
   function next() {
@@ -1554,6 +1602,21 @@
     h += '<div class="restart"><button class="btn ghost" id="again">Пройти заново</button></div>';
 
     el("result").innerHTML = h;
+
+    var scores = {};
+    rank.forEach(function (r) { scores[r.key] = r.pct; });
+    sentFinal = true;
+    track({
+      event: "дошёл",
+      answers: ans,
+      scores: scores,
+      top: [rank[0].name, rank[1].name, rank[2].name],
+      calm: calm, tie: tie, carbSpecific: carbSpecific,
+      blocker: blocker, concern: concern
+    });
+
+    var cta = el("result").querySelector("a.btn");
+    if (cta) cta.addEventListener("click", function () { track({ event: "нажал на интенсив" }, true); });
 
     el("again").addEventListener("click", function () { ans = {}; idx = 0; show("start"); });
   }
